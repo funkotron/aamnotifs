@@ -24,9 +24,10 @@ class Notifs(object):
             self.connection = pika.BlockingConnection(pika.URLParameters(url))
             self.channel = self.connection.channel()
             self.channel.exchange_declare(exchange=self.exchange, type='topic')
-        except:
+        except Exception, e:
+            print e
             time.sleep(2)
-            self.connect(url)
+            self.connect(self, url)
 
     def receive(self, routings, callback):
         if type(routings) == str:
