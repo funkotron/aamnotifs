@@ -16,6 +16,7 @@ import json
 class Notifs(object):
 
     def __init__(self, url, exchange="notifs"):
+        self.url = url
         self.exchange = exchange
         self.connect(url)
 
@@ -25,9 +26,9 @@ class Notifs(object):
             self.channel = self.connection.channel()
             self.channel.exchange_declare(exchange=self.exchange, type='topic')
         except Exception, e:
-            print e
+            print "connection failed: ", e
             time.sleep(2)
-            self.connect(self, url)
+            self.connect(url)
 
     def receive(self, routings, callback):
         if type(routings) == str:
@@ -51,7 +52,7 @@ class Notifs(object):
 
         except:
             time.sleep(2)
-            self.connect()
+            self.connect(self.url)
             self.receive(routings, callback)
 
     def send(self, routing, title, message):
@@ -60,8 +61,9 @@ class Notifs(object):
         try:
             self.channel.basic_publish(exchange=self.exchange,
                                        routing_key=routing, body=body)
-        except:
+        except Exception, e:
+            print e
             time.sleep(2)
-            self.connect()
+            self.connect(self.url)
             self.channel.basic_publish(exchange=self.exchange,
                                        routing_key=routing, body=body)
